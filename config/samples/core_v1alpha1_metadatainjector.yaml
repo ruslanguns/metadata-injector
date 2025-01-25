@@ -1,0 +1,19 @@
+apiVersion: core.k8s.ruso.dev/v1alpha1
+kind: MetadataInjector
+metadata:
+  name: metadatainjector-sample
+spec:
+  selectors:
+    - kind: Secret
+      version: v1
+      namespaces:
+        - default
+        - kube-system
+      names:
+        - secret-name-1
+        - secret-name-2
+  inject:
+    labels:
+      foo: "bar"
+    annotations:
+      bar: "foo"
