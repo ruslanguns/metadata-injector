@@ -26,7 +26,9 @@ This is particularly useful for:
 - kubectl version v1.11.3+
 - Access to a Kubernetes v1.11.3+ cluster
 
-### Installation
+### Installation Methods
+
+#### Method 1: Using Make Commands
 
 1. **Install the CRDs:**
 ```sh
@@ -36,6 +38,21 @@ make install
 2. **Deploy the operator:**
 ```sh
 make deploy IMG=<your-registry>/metadata-injector-operator:tag
+```
+
+#### Method 2: Using Helm
+
+1. **Add the Helm repository:**
+```sh
+helm repo add metadata-injector https://ruslanguns.github.io/metadata-injector-operator
+helm repo update
+```
+
+2. **Install the chart:**
+```sh
+helm install metadata-injector metadata-injector/metadata-injector-operator \
+  --namespace metadata-injector-system \
+  --create-namespace
 ```
 
 ### Usage
@@ -74,12 +91,89 @@ spec:
 kubectl apply -f config/samples/
 ```
 
-### Configuration Options
+### Configuration
+
+#### Operator Configuration
+
+The following configuration options are available:
 
 - **Reconciliation Interval**: Set using the `metadata-injector.ruso.dev/reconcile-interval` annotation
 - **Auto Reconciliation**: Control using the `metadata-injector.ruso.dev/disable-auto-reconcile` annotation
 - **Resource Selection**: Configure using spec.selectors to target specific resources
 - **Metadata Injection**: Define labels and annotations to inject in spec.inject
+
+#### Helm Chart Configuration
+
+The following values can be customized in your Helm chart installation:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `nameOverride` | Override the name of the chart | `""` |
+| `fullnameOverride` | Override the full name of the chart | `""` |
+| `namespace.create` | Create the namespace | `true` |
+| `namespace.name` | Namespace name | `"metadata-injector-system"` |
+| `image.repository` | Operator image repository | `ruslanguns/metadata-injector-operator` |
+| `image.tag` | Operator image tag | `v0.0.1` |
+| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `serviceAccount.create` | Create service account | `true` |
+| `serviceAccount.name` | Service account name | `""` |
+| `serviceAccount.annotations` | Service account annotations | `{}` |
+| `rbac.create` | Create RBAC resources | `true` |
+| `resources.limits.cpu` | CPU resource limits | `500m` |
+| `resources.limits.memory` | Memory resource limits | `128Mi` |
+| `resources.requests.cpu` | CPU resource requests | `10m` |
+| `resources.requests.memory` | Memory resource requests | `64Mi` |
+| `metrics.enabled` | Enable metrics | `true` |
+| `metrics.port` | Metrics port | `8443` |
+| `metrics.service.type` | Metrics service type | `ClusterIP` |
+| `probe.port` | Health probe port | `8081` |
+| `probe.liveness.initialDelaySeconds` | Liveness probe initial delay | `15` |
+| `probe.liveness.periodSeconds` | Liveness probe period | `20` |
+| `probe.readiness.initialDelaySeconds` | Readiness probe initial delay | `5` |
+| `probe.readiness.periodSeconds` | Readiness probe period | `10` |
+| `podSecurityContext.runAsNonRoot` | Run as non-root | `true` |
+| `replicaCount` | Number of operator replicas | `1` |
+| `crds.create` | Create CRDs | `true` |
+| `podAnnotations` | Additional pod annotations | `{}` |
+| `nodeSelector` | Node selector configuration | `{}` |
+| `tolerations` | Pod tolerations | `[]` |
+| `affinity` | Pod affinity rules | `{}` |
+
+Example custom values file:
+```yaml
+# custom-values.yaml
+namespace:
+  name: "custom-namespace"
+
+image:
+  repository: custom-registry/metadata-injector-operator
+  tag: v1.0.0
+
+resources:
+  limits:
+    cpu: "1"
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+
+metrics:
+  enabled: true
+  service:
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8443"
+
+replicaCount: 2
+```
+
+Apply custom values:
+```sh
+helm install metadata-injector metadata-injector/metadata-injector-operator \
+  -f custom-values.yaml \
+  --namespace metadata-injector-system \
+  --create-namespace
+```
 
 ### Monitoring
 
@@ -97,6 +191,8 @@ This shows:
 
 ### Uninstallation
 
+#### Method 1: Using Make Commands
+
 1. **Remove MetadataInjector resources:**
 ```sh
 kubectl delete -k config/samples/
@@ -110,6 +206,12 @@ make undeploy
 3. **Remove CRDs:**
 ```sh
 make uninstall
+```
+
+#### Method 2: Using Helm
+
+```sh
+helm uninstall metadata-injector -n metadata-injector-system
 ```
 
 ## Contributing
