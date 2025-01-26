@@ -1,0 +1,27 @@
+---
+apiVersion: "1.0.0"
+release-notes:
+  version: "${VERSION}"
+  kind: added
+  description: |
+    🚀 Features
+    - Automatic metadata injection for Kubernetes resources
+    - Configurable resource selection via selectors
+    - Namespace filtering support
+    - Automatic reconciliation with configurable intervals
+
+    🔧 Technical Details
+    - Image: ruslanguns/metadata-injector-operator:v${VERSION}
+    - Helm chart version: ${VERSION}
+    - Kubernetes compatibility: 1.16+
+
+    🔍 Installation
+    ```
+    helm repo add metadata-injector \
+      https://ruslanguns.github.io/metadata-injector-operator
+    helm install metadata-injector \
+      metadata-injector/metadata-injector \
+      --version ${VERSION}
+    ```
+  contains_security_updates: false
+  recommended_engine_version: ""

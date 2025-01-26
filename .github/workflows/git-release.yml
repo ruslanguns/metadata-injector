@@ -24,10 +24,7 @@ jobs:
           path: release-artifacts
 
       - name: Generate manifests
-        run: |
-          make build-installer \
-            VERSION=${VERSION} \
-            IMG=${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator:v${VERSION}
+        run: make build-installer VERSION=${VERSION}
 
       - name: Generate CRDs Bundle
         run: |
@@ -39,7 +36,9 @@ jobs:
 
       - name: Generate Release Notes
         run: |
-          VERSION=${VERSION} envsubst < .github/release-template.md > release-artifacts/release-notes.md
+          mkdir -p .artifacthub/release-notes
+          VERSION=${VERSION} envsubst < .github/release-template-artifacthub.yml > \
+            .artifacthub/release-notes/v${VERSION}.yml
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -48,5 +47,6 @@ jobs:
             release-artifacts/*.yaml
             release-artifacts/*.tar.gz
             release-artifacts/*.tgz
-          body_path: release-artifacts/release-notes.md
+            .artifacthub/release-notes/v${{ env.VERSION }}.yml
+          body_path: .artifacthub/release-notes/v${{ env.VERSION }}.yml
           generate_release_notes: true

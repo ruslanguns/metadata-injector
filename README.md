@@ -1,5 +1,7 @@
 # Metadata Injector Operator
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/metadata-injector-operator)](https://artifacthub.io/packages/search?repo=metadata-injector-operator)
+
 A Kubernetes operator that automatically injects metadata (labels and annotations) into specified resources across your cluster.
 
 ## Description
