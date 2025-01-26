@@ -1,0 +1,32 @@
+apiVersion: v1
+entries:
+  metadata-injector:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial release
+      artifacthub.io/operator: "true"
+      artifacthub.io/operatorCapabilities: Basic Install
+    apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-01-26T21:12:56.875663943Z"
+    description: A Kubernetes operator that automatically injects metadata into specified
+      resources across your cluster
+    digest: d7e57376f397c0fbfeac521b1f1cdc0e9505eb5493a288b728cf55c63851e66c
+    home: https://github.com/ruslanguns/metadata-injector-operator
+    keywords:
+    - kubernetes
+    - operator
+    - metadata
+    - injector
+    maintainers:
+    - email: ruslanguns@gmail.com
+      name: Ruslan Gonzalez
+    name: metadata-injector
+    sources:
+    - https://github.com/ruslanguns/metadata-injector-operator
+    type: application
+    urls:
+    - https://ruslanguns.github.io/metadata-injector-operator/charts/metadata-injector-0.0.1.tgz
+    version: 0.0.1
+generated: "2025-01-26T21:12:56.874888772Z"
