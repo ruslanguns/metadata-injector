@@ -102,6 +102,7 @@ type MetadataInjectorStatus struct {
 //+kubebuilder:printcolumn:name="Interval",type="string",JSONPath=".status.interval"
 //+kubebuilder:printcolumn:name="Last Success",type="string",JSONPath=".status.lastSuccessfulTime"
 //+kubebuilder:printcolumn:name="Next Run",type="string",JSONPath=".status.nextScheduledTime"
+//+kubebuilder:resource:shortName=mi
 
 // MetadataInjector is the Schema for the metadatainjectors API
 type MetadataInjector struct {
