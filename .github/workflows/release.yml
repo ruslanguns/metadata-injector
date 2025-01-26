@@ -9,89 +9,17 @@ jobs:
   verify:
     uses: ./.github/workflows/verify.yml
 
-  release:
+  docker:
     needs: verify
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: write
-      packages: write
+    uses: ./.github/workflows/docker-build.yml
+    secrets: inherit
 
-    env:
-      REGISTRY: docker.io
-      OPERATOR_SDK_VERSION: 1.39.0
-      PLATFORMS: linux/amd64,linux/arm64
+  helm:
+    needs: docker
+    uses: ./.github/workflows/helm-build.yml
+    secrets: inherit
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.22"
-          cache: true
-
-      - name: Extract version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Install Operator SDK
-        run: |
-          export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n arm64 ;; *) echo -n $(uname -m) ;; esac)
-          export OS=$(uname | awk '{print tolower($0)}')
-          export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/v${OPERATOR_SDK_VERSION}
-          curl -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH}
-          chmod +x operator-sdk_${OS}_${ARCH}
-          sudo mv operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
-
-      - name: Build and push release
-        run: |
-          make release \
-            VERSION=${VERSION} \
-            IMG=${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator:v${VERSION}
-
-      - name: Update development manifests
-        run: |
-          make build-installer \
-            VERSION=${VERSION} \
-            IMG=${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator:v${VERSION}
-
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: v3.12.0
-
-      - name: Update Helm Chart version and values
-        run: |
-          # Actualizar versión del chart y appVersion
-          sed -i "s/^version:.*/version: ${VERSION}/" charts/metadata-injector/Chart.yaml
-          sed -i "s/^appVersion:.*/appVersion: \"${VERSION}\"/" charts/metadata-injector/Chart.yaml
-
-          # Actualizar la imagen en values.yaml
-          sed -i "s|repository:.*|repository: ${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator|" charts/metadata-injector/values.yaml
-          sed -i "s|tag:.*|tag: v${VERSION}|" charts/metadata-injector/values.yaml
-
-      - name: Package Helm Chart
-        run: |
-          mkdir -p .cr-release-packages
-          helm package charts/metadata-injector --destination .cr-release-packages
-
-      - name: Upload Helm Chart to GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            .cr-release-packages/*
-            dist/install.yaml
-          generate_release_notes: true
+  git-release:
+    needs: [docker, helm]
+    uses: ./.github/workflows/git-release.yml
+    secrets: inherit

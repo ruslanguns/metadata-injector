@@ -1,0 +1,45 @@
+name: Helm Build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Update Helm Chart version and values
+        run: |
+          # Update chart version and appVersion
+          sed -i "s/^version:.*/version: ${VERSION}/" charts/metadata-injector/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"${VERSION}\"/" charts/metadata-injector/Chart.yaml
+
+          # Update image in values.yaml
+          sed -i "s|repository:.*|repository: ${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator|" charts/metadata-injector/values.yaml
+          sed -i "s|tag:.*|tag: v${VERSION}|" charts/metadata-injector/values.yaml
+
+      - name: Package Helm Chart
+        run: |
+          mkdir -p .cr-release-packages
+          helm package charts/metadata-injector --destination .cr-release-packages
+
+      - name: Upload Helm artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: helm-artifacts
+          path: .cr-release-packages/
+          retention-days: 1
