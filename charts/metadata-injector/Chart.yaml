@@ -10,6 +10,14 @@ keywords:
   - metadata
   - injector
 home: https://github.com/ruslanguns/metadata-injector-operator
+sources:
+  - https://github.com/ruslanguns/metadata-injector-operator
 maintainers:
   - name: Ruslan Gonzalez
     email: ruslanguns@gmail.com
+annotations:
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial release
+  artifacthub.io/operator: "true"
+  artifacthub.io/operatorCapabilities: Basic Install
