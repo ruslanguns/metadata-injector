@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -71,6 +72,7 @@ type MetadataInjectorReconciler struct {
 	Scheme        *runtime.Scheme
 	DynamicClient dynamic.Interface
 	scheduler     *BatchScheduler
+	recorder      record.EventRecorder
 }
 
 func NewBatchScheduler(c client.Client, dc dynamic.Interface, batchInterval time.Duration, workers int) *BatchScheduler {
@@ -231,6 +233,20 @@ func (bs *BatchScheduler) processJob(ctx context.Context, job ReconcileJob) erro
 				}
 			}
 		}
+
+		// Update status
+		now := metav1.Now()
+		nextRun := calculateNextRun(job.Injector)
+
+		patch := client.MergeFrom(job.Injector.DeepCopy())
+		job.Injector.Status.LastSuccessfulTime = &now
+		job.Injector.Status.NextScheduledTime = &metav1.Time{Time: nextRun}
+
+		if err := bs.client.Status().Patch(ctx, job.Injector, patch); err != nil {
+			return fmt.Errorf("failed to update status: %w", err)
+		}
+
+		return nil
 	}
 
 	// Update status
@@ -286,7 +302,8 @@ func (r *MetadataInjectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{}, nil
+	// Requeue based on the next scheduled run
+	return ctrl.Result{RequeueAfter: time.Until(job.NextRun)}, nil
 }
 
 func (r *MetadataInjectorReconciler) SetupWithManager(mgr ctrl.Manager) error {

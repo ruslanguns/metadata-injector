@@ -20,10 +20,10 @@ spec:
       type: date
     - jsonPath: .status.lastSuccessfulTime
       name: Last Success
-      type: date
+      type: string
     - jsonPath: .status.nextScheduledTime
       name: Next Run
-      type: date
+      type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
