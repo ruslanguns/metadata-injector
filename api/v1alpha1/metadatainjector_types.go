@@ -83,6 +83,10 @@ type MetadataInjectorStatus struct {
 	// +optional
 	LastSuccessfulTime *metav1.Time `json:"lastSuccessfulTime,omitempty"`
 
+	// Interval is the interval between reconciliations
+	// +optional
+	Interval string `json:"interval,omitempty"`
+
 	// Conditions represent the latest available observations of an object's state
 	// +optional
 	// +patchMergeKey=type
@@ -95,6 +99,7 @@ type MetadataInjectorStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+//+kubebuilder:printcolumn:name="Interval",type="string",JSONPath=".status.interval"
 //+kubebuilder:printcolumn:name="Last Success",type="string",JSONPath=".status.lastSuccessfulTime"
 //+kubebuilder:printcolumn:name="Next Run",type="string",JSONPath=".status.nextScheduledTime"
 

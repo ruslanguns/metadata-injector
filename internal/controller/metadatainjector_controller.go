@@ -29,7 +29,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -72,7 +71,6 @@ type MetadataInjectorReconciler struct {
 	Scheme        *runtime.Scheme
 	DynamicClient dynamic.Interface
 	scheduler     *BatchScheduler
-	recorder      record.EventRecorder
 }
 
 func NewBatchScheduler(c client.Client, dc dynamic.Interface, batchInterval time.Duration, workers int) *BatchScheduler {
@@ -151,6 +149,20 @@ func (bs *BatchScheduler) worker() {
 
 func (bs *BatchScheduler) processJob(ctx context.Context, job ReconcileJob) error {
 	log := log.FromContext(ctx)
+
+	// Get current interval status
+	interval := defaultReconcileInterval
+	if customInterval, ok := job.Injector.Annotations[annotationReconcileInterval]; ok {
+		if parsed, err := time.ParseDuration(customInterval); err == nil {
+			interval = parsed
+		}
+	}
+
+	// Set status based on auto-reconcile setting
+	intervalStatus := interval.String()
+	if disabled, _ := strconv.ParseBool(job.Injector.Annotations[annotationDisableAutoReconcile]); disabled {
+		intervalStatus = "False"
+	}
 
 	for _, selector := range job.Injector.Spec.Selectors {
 		log.Info("Processing selector", "selector", selector)
@@ -233,33 +245,21 @@ func (bs *BatchScheduler) processJob(ctx context.Context, job ReconcileJob) erro
 				}
 			}
 		}
-
-		// Update status
-		now := metav1.Now()
-		nextRun := calculateNextRun(job.Injector)
-
-		patch := client.MergeFrom(job.Injector.DeepCopy())
-		job.Injector.Status.LastSuccessfulTime = &now
-		job.Injector.Status.NextScheduledTime = &metav1.Time{Time: nextRun}
-
-		if err := bs.client.Status().Patch(ctx, job.Injector, patch); err != nil {
-			return fmt.Errorf("failed to update status: %w", err)
-		}
-
-		return nil
 	}
 
-	// Update status
+	return bs.updateStatus(ctx, job.Injector, intervalStatus)
+}
+
+func (bs *BatchScheduler) updateStatus(ctx context.Context, injector *corev1alpha1.MetadataInjector, intervalStatus string) error {
 	now := metav1.Now()
-	job.Injector.Status.LastSuccessfulTime = &now
-	nextRun := metav1.NewTime(job.NextRun)
-	job.Injector.Status.NextScheduledTime = &nextRun
+	nextRun := calculateNextRun(injector)
 
-	if err := bs.client.Status().Update(ctx, job.Injector); err != nil {
-		return fmt.Errorf("failed to update status: %w", err)
-	}
+	patch := client.MergeFrom(injector.DeepCopy())
+	injector.Status.LastSuccessfulTime = &now
+	injector.Status.NextScheduledTime = &metav1.Time{Time: nextRun}
+	injector.Status.Interval = intervalStatus
 
-	return nil
+	return bs.client.Status().Patch(ctx, injector, patch)
 }
 
 func shouldProcess(injector *corev1alpha1.MetadataInjector) bool {
