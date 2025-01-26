@@ -1,100 +1,120 @@
-# operators
-// TODO(user): Add simple overview of use/purpose
+# Metadata Injector Operator
+
+A Kubernetes operator that automatically injects metadata (labels and annotations) into specified resources across your cluster.
 
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+
+The Metadata Injector Operator provides a way to automatically manage and inject metadata into Kubernetes resources. It allows you to:
+
+- Define target resources by kind, group, version, and names
+- Specify namespaces to include or exclude
+- Inject custom labels and annotations
+- Configure automatic reconciliation intervals
+- Enable/disable automatic reconciliation
+
+This is particularly useful for:
+- Enforcing consistent metadata across resources
+- Implementing governance policies
+- Automating resource tagging
+- Managing resource classifications
 
 ## Getting Started
 
 ### Prerequisites
 - go version v1.22.0+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
+- docker version 17.03+
+- kubectl version v1.11.3+
+- Access to a Kubernetes v1.11.3+ cluster
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+### Installation
 
-```sh
-make docker-build docker-push IMG=<some-registry>/operators:tag
-```
-
-**NOTE:** This image ought to be published in the personal registry you specified.
-And it is required to have access to pull the image from the working environment.
-Make sure you have the proper permission to the registry if the above commands don’t work.
-
-**Install the CRDs into the cluster:**
-
+1. **Install the CRDs:**
 ```sh
 make install
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
-
+2. **Deploy the operator:**
 ```sh
-make deploy IMG=<some-registry>/operators:tag
+make deploy IMG=<your-registry>/metadata-injector-operator:tag
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
+### Usage
 
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+1. Create a MetadataInjector resource:
 
-```sh
-kubectl apply -k config/samples/
+```yaml
+apiVersion: core.k8s.ruso.dev/v1alpha1
+kind: MetadataInjector
+metadata:
+  name: example-injector
+  annotations:
+    metadata-injector.ruso.dev/reconcile-interval: "5m"  # Optional: Custom reconciliation interval
+    metadata-injector.ruso.dev/disable-auto-reconcile: "false"  # Optional: Disable automatic reconciliation
+spec:
+  selectors:
+    - kind: Secret
+      group: ""
+      version: "v1"
+      namespaces:
+        - default
+        - kube-system
+      names:
+        - secret-name-1
+        - secret-name-2
+  inject:
+    labels:
+      environment: production
+      team: platform
+    annotations:
+      description: "Managed by metadata-injector"
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+2. Apply the configuration:
+```sh
+kubectl apply -f config/samples/
+```
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
+### Configuration Options
 
+- **Reconciliation Interval**: Set using the `metadata-injector.ruso.dev/reconcile-interval` annotation
+- **Auto Reconciliation**: Control using the `metadata-injector.ruso.dev/disable-auto-reconcile` annotation
+- **Resource Selection**: Configure using spec.selectors to target specific resources
+- **Metadata Injection**: Define labels and annotations to inject in spec.inject
+
+### Monitoring
+
+Monitor the status of your MetadataInjector:
+
+```sh
+kubectl get metadatainjectors
+```
+
+This shows:
+- Age of the injector
+- Last successful execution
+- Next scheduled run
+- Current reconciliation interval
+
+### Uninstallation
+
+1. **Remove MetadataInjector resources:**
 ```sh
 kubectl delete -k config/samples/
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
-
-```sh
-make uninstall
-```
-
-**UnDeploy the controller from the cluster:**
-
+2. **Remove the operator:**
 ```sh
 make undeploy
 ```
 
-## Project Distribution
-
-Following are the steps to build the installer and distribute this project to users.
-
-1. Build the installer for the image built and published in the registry:
-
+3. **Remove CRDs:**
 ```sh
-make build-installer IMG=<some-registry>/operators:tag
-```
-
-NOTE: The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without
-its dependencies.
-
-2. Using the installer
-
-Users can just run kubectl apply -f <URL for YAML BUNDLE> to install the project, i.e.:
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/<org>/operators/<tag or branch>/dist/install.yaml
+make uninstall
 ```
 
 ## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
 
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
@@ -111,4 +131,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
