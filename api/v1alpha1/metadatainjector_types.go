@@ -96,13 +96,13 @@ type MetadataInjectorStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
-//+kubebuilder:printcolumn:name="Interval",type="string",JSONPath=".status.interval"
-//+kubebuilder:printcolumn:name="Last Success",type="string",JSONPath=".status.lastSuccessfulTime"
-//+kubebuilder:printcolumn:name="Next Run",type="string",JSONPath=".status.nextScheduledTime"
-//+kubebuilder:resource:shortName=mi
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
+// +kubebuilder:printcolumn:name="Interval",type="string",JSONPath=".status.interval"
+// +kubebuilder:printcolumn:name="Last Success",type="string",JSONPath=".status.lastSuccessfulTime"
+// +kubebuilder:printcolumn:name="Next Run",type="string",JSONPath=".status.nextScheduledTime"
+// +kubebuilder:resource:shortName=mi
 
 // MetadataInjector is the Schema for the metadatainjectors API
 type MetadataInjector struct {
@@ -113,7 +113,7 @@ type MetadataInjector struct {
 	Status MetadataInjectorStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // MetadataInjectorList contains a list of MetadataInjector
 type MetadataInjectorList struct {
