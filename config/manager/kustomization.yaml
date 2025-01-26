@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: ruslanguns/metadata-injector-operator
-  newTag: 0.0.1-alpha.15
+  newTag: v0.0.1
