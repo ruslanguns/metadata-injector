@@ -50,7 +50,7 @@ endif
 # This is useful for CI or a project to utilize a specific version of the operator-sdk toolkit.
 OPERATOR_SDK_VERSION ?= 1.39.0
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= $(IMAGE_TAG_BASE):v$(VERSION)
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.31.0
 
@@ -334,3 +334,12 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+.PHONY: release
+release: manifests generate bundle docker-build docker-push bundle-build bundle-push catalog-build catalog-push ## Build and push all images (operator, bundle, and catalog)
+	@echo "═══════════════════════════════════════════"
+	@echo "  Release v$(VERSION) completed"
+	@echo "  Operator Image: $(IMG)"
+	@echo "  Bundle Image:   $(BUNDLE_IMG)"
+	@echo "  Catalog Image:  $(CATALOG_IMG)"
+	@echo "═══════════════════════════════════════════"
