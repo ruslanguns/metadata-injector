@@ -5,22 +5,21 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   labels:
-    app.kubernetes.io/name: operators
-    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: metadata-injector
   name: allow-metrics-traffic
   namespace: system
 spec:
   podSelector:
     matchLabels:
-      control-plane: controller-manager
+      control-plane: metadata-injector-controller
   policyTypes:
     - Ingress
   ingress:
     # This allows ingress traffic from any namespace with the label metrics: enabled
     - from:
-      - namespaceSelector:
-          matchLabels:
-            metrics: enabled  # Only from namespaces with this label
+        - namespaceSelector:
+            matchLabels:
+              metrics: enabled # Only from namespaces with this label
       ports:
         - port: 8443
           protocol: TCP

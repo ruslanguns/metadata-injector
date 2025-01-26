@@ -38,73 +38,74 @@ metadata:
   name: metadata-injector.v0.0.1
   namespace: placeholder
 spec:
-  minKubeVersion: "1.16.0"
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-      - description: MetadataInjector is the Schema for the metadatainjectors API
-        displayName: Metadata Injector
-        kind: MetadataInjector
-        name: metadatainjectors.core.k8s.ruso.dev
-        version: v1alpha1
-  description: A Kubernetes operator that automatically injects metadata (labels and annotations) into specified resources across your cluster.
+    - description: MetadataInjector is the Schema for the metadatainjectors API
+      displayName: Metadata Injector
+      kind: MetadataInjector
+      name: metadatainjectors.core.k8s.ruso.dev
+      version: v1alpha1
+  description: A Kubernetes operator that automatically injects metadata (labels and
+    annotations) into specified resources across your cluster.
   displayName: Metadata Injector Operator
   install:
     spec:
       deployments:
-        - name: metadata-injector-controller-manager
-          spec:
-            replicas: 1
-            selector:
-              matchLabels:
-                control-plane: controller-manager
-            strategy: {}
-            template:
-              metadata:
-                labels:
-                  control-plane: controller-manager
-              spec:
-                containers:
-                  - args:
-                      - --leader-elect
-                    image: ruslanguns/metadata-injector-operator:v0.0.1
-                    name: manager
-                    resources:
-                      limits:
-                        cpu: 500m
-                        memory: 128Mi
-                      requests:
-                        cpu: 10m
-                        memory: 64Mi
-                    securityContext:
-                      allowPrivilegeEscalation: false
-                      capabilities:
-                        drop:
-                          - ALL
+      - name: metadata-injector-controller
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: metadata-injector-controller
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                control-plane: metadata-injector-controller
+            spec:
+              containers:
+              - args:
+                - --leader-elect
+                image: ruslanguns/metadata-injector-operator:v0.0.1
+                name: manager
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
                 securityContext:
-                  runAsNonRoot: true
-                terminationGracePeriodSeconds: 10
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              terminationGracePeriodSeconds: 10
     strategy: deployment
   installModes:
-    - supported: true
-      type: OwnNamespace
-    - supported: true
-      type: SingleNamespace
-    - supported: false
-      type: MultiNamespace
-    - supported: true
-      type: AllNamespaces
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
   keywords:
-    - kubernetes
-    - operator
-    - metadata
-    - injector
-    - labels
-    - annotations
+  - kubernetes
+  - operator
+  - metadata
+  - injector
+  - labels
+  - annotations
   maintainers:
-    - email: ruslanguns@gmail.com
-      name: Ruslan Gonzalez
+  - email: ruslanguns@gmail.com
+    name: Ruslan Gonzalez
   maturity: alpha
+  minKubeVersion: 1.16.0
   provider:
     name: k8s.ruso.dev
     url: https://k8s.ruso.dev

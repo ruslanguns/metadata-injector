@@ -3,25 +3,24 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    app.kubernetes.io/name: operators
-    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: metadata-injector
   name: metadatainjector-editor-role
 rules:
-- apiGroups:
-  - core.k8s.ruso.dev
-  resources:
-  - metadatainjectors
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.k8s.ruso.dev
-  resources:
-  - metadatainjectors/status
-  verbs:
-  - get
+  - apiGroups:
+      - core.k8s.ruso.dev
+    resources:
+      - metadatainjectors
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - core.k8s.ruso.dev
+    resources:
+      - metadatainjectors/status
+    verbs:
+      - get

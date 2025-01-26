@@ -4,17 +4,17 @@
 # More info: https://book.kubebuilder.io/reference/project-config.html
 domain: k8s.ruso.dev
 layout:
-- go.kubebuilder.io/v4
-projectName: operators
+  - go.kubebuilder.io/v4
+projectName: metadata-injector
 repo: github.com/ruslanguns/metadata-injector-operator
 resources:
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: k8s.ruso.dev
-  group: core
-  kind: MetadataInjector
-  path: github.com/ruslanguns/metadata-injector-operator/api/v1alpha1
-  version: v1alpha1
+  - api:
+      crdVersion: v1
+      namespaced: true
+    controller: true
+    domain: k8s.ruso.dev
+    group: core
+    kind: MetadataInjector
+    path: github.com/ruslanguns/metadata-injector-operator/api/v1alpha1
+    version: v1alpha1
 version: "3"
