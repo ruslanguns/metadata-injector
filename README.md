@@ -15,6 +15,7 @@ The Metadata Injector Operator provides a way to automatically manage and inject
 - Enable/disable automatic reconciliation
 
 This is particularly useful for:
+
 - Enforcing consistent metadata across resources
 - Implementing governance policies
 - Automating resource tagging
@@ -23,6 +24,7 @@ This is particularly useful for:
 ## Getting Started
 
 ### Prerequisites
+
 - go version v1.22.0+
 - docker version 17.03+
 - kubectl version v1.11.3+
@@ -33,11 +35,13 @@ This is particularly useful for:
 #### Method 1: Using Make Commands
 
 1. **Install the CRDs:**
+
 ```sh
 make install
 ```
 
 2. **Deploy the operator:**
+
 ```sh
 make deploy IMG=<your-registry>/metadata-injector-operator:tag
 ```
@@ -45,14 +49,16 @@ make deploy IMG=<your-registry>/metadata-injector-operator:tag
 #### Method 2: Using Helm
 
 1. **Add the Helm repository:**
+
 ```sh
-helm repo add metadata-injector https://ruslanguns.github.io/metadata-injector-operator
+helm repo add metadata-injector-operator https://ruslanguns.github.io/metadata-injector-operator/charts
 helm repo update
 ```
 
 2. **Install the chart:**
+
 ```sh
-helm install metadata-injector metadata-injector/metadata-injector-operator \
+ helm install metadata-injector metadata-injector/metadata-injector-operator \
   --namespace metadata-injector-system \
   --create-namespace
 ```
@@ -67,8 +73,8 @@ kind: MetadataInjector
 metadata:
   name: example-injector
   annotations:
-    metadata-injector.ruso.dev/reconcile-interval: "5m"  # Optional: Custom reconciliation interval
-    metadata-injector.ruso.dev/disable-auto-reconcile: "false"  # Optional: Disable automatic reconciliation
+    metadata-injector.ruso.dev/reconcile-interval: "5m"
+    metadata-injector.ruso.dev/disable-auto-reconcile: "false"
 spec:
   selectors:
     - kind: Secret
@@ -89,6 +95,7 @@ spec:
 ```
 
 2. Apply the configuration:
+
 ```sh
 kubectl apply -f config/samples/
 ```
@@ -108,40 +115,41 @@ The following configuration options are available:
 
 The following values can be customized in your Helm chart installation:
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `nameOverride` | Override the name of the chart | `""` |
-| `fullnameOverride` | Override the full name of the chart | `""` |
-| `namespace.create` | Create the namespace | `true` |
-| `namespace.name` | Namespace name | `"metadata-injector-system"` |
-| `image.repository` | Operator image repository | `ruslanguns/metadata-injector-operator` |
-| `image.tag` | Operator image tag | `v0.0.1` |
-| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
-| `serviceAccount.create` | Create service account | `true` |
-| `serviceAccount.name` | Service account name | `""` |
-| `serviceAccount.annotations` | Service account annotations | `{}` |
-| `rbac.create` | Create RBAC resources | `true` |
-| `resources.limits.cpu` | CPU resource limits | `500m` |
-| `resources.limits.memory` | Memory resource limits | `128Mi` |
-| `resources.requests.cpu` | CPU resource requests | `10m` |
-| `resources.requests.memory` | Memory resource requests | `64Mi` |
-| `metrics.enabled` | Enable metrics | `true` |
-| `metrics.port` | Metrics port | `8443` |
-| `metrics.service.type` | Metrics service type | `ClusterIP` |
-| `probe.port` | Health probe port | `8081` |
-| `probe.liveness.initialDelaySeconds` | Liveness probe initial delay | `15` |
-| `probe.liveness.periodSeconds` | Liveness probe period | `20` |
-| `probe.readiness.initialDelaySeconds` | Readiness probe initial delay | `5` |
-| `probe.readiness.periodSeconds` | Readiness probe period | `10` |
-| `podSecurityContext.runAsNonRoot` | Run as non-root | `true` |
-| `replicaCount` | Number of operator replicas | `1` |
-| `crds.create` | Create CRDs | `true` |
-| `podAnnotations` | Additional pod annotations | `{}` |
-| `nodeSelector` | Node selector configuration | `{}` |
-| `tolerations` | Pod tolerations | `[]` |
-| `affinity` | Pod affinity rules | `{}` |
+| Parameter                             | Description                         | Default                                 |
+| ------------------------------------- | ----------------------------------- | --------------------------------------- |
+| `nameOverride`                        | Override the name of the chart      | `""`                                    |
+| `fullnameOverride`                    | Override the full name of the chart | `""`                                    |
+| `namespace.create`                    | Create the namespace                | `true`                                  |
+| `namespace.name`                      | Namespace name                      | `"metadata-injector-system"`            |
+| `image.repository`                    | Operator image repository           | `ruslanguns/metadata-injector-operator` |
+| `image.tag`                           | Operator image tag                  | `v0.0.1`                                |
+| `image.pullPolicy`                    | Image pull policy                   | `IfNotPresent`                          |
+| `serviceAccount.create`               | Create service account              | `true`                                  |
+| `serviceAccount.name`                 | Service account name                | `""`                                    |
+| `serviceAccount.annotations`          | Service account annotations         | `{}`                                    |
+| `rbac.create`                         | Create RBAC resources               | `true`                                  |
+| `resources.limits.cpu`                | CPU resource limits                 | `500m`                                  |
+| `resources.limits.memory`             | Memory resource limits              | `128Mi`                                 |
+| `resources.requests.cpu`              | CPU resource requests               | `10m`                                   |
+| `resources.requests.memory`           | Memory resource requests            | `64Mi`                                  |
+| `metrics.enabled`                     | Enable metrics                      | `true`                                  |
+| `metrics.port`                        | Metrics port                        | `8443`                                  |
+| `metrics.service.type`                | Metrics service type                | `ClusterIP`                             |
+| `probe.port`                          | Health probe port                   | `8081`                                  |
+| `probe.liveness.initialDelaySeconds`  | Liveness probe initial delay        | `15`                                    |
+| `probe.liveness.periodSeconds`        | Liveness probe period               | `20`                                    |
+| `probe.readiness.initialDelaySeconds` | Readiness probe initial delay       | `5`                                     |
+| `probe.readiness.periodSeconds`       | Readiness probe period              | `10`                                    |
+| `podSecurityContext.runAsNonRoot`     | Run as non-root                     | `true`                                  |
+| `replicaCount`                        | Number of operator replicas         | `1`                                     |
+| `crds.create`                         | Create CRDs                         | `true`                                  |
+| `podAnnotations`                      | Additional pod annotations          | `{}`                                    |
+| `nodeSelector`                        | Node selector configuration         | `{}`                                    |
+| `tolerations`                         | Pod tolerations                     | `[]`                                    |
+| `affinity`                            | Pod affinity rules                  | `{}`                                    |
 
 Example custom values file:
+
 ```yaml
 # custom-values.yaml
 namespace:
@@ -170,6 +178,7 @@ replicaCount: 2
 ```
 
 Apply custom values:
+
 ```sh
 helm install metadata-injector metadata-injector/metadata-injector-operator \
   -f custom-values.yaml \
@@ -186,6 +195,7 @@ kubectl get metadatainjectors
 ```
 
 This shows:
+
 - Age of the injector
 - Last successful execution
 - Next scheduled run
@@ -196,16 +206,19 @@ This shows:
 #### Method 1: Using Make Commands
 
 1. **Remove MetadataInjector resources:**
+
 ```sh
 kubectl delete -k config/samples/
 ```
 
 2. **Remove the operator:**
+
 ```sh
 make undeploy
 ```
 
 3. **Remove CRDs:**
+
 ```sh
 make uninstall
 ```
@@ -235,3 +248,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+

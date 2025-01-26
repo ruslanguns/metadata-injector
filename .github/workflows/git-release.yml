@@ -23,17 +23,6 @@ jobs:
           name: helm-artifacts
           path: release-artifacts
 
-      - name: Generate manifests
-        run: make build-installer VERSION=${VERSION}
-
-      - name: Generate CRDs Bundle
-        run: |
-          mkdir -p release-artifacts/crds
-          cp config/crd/bases/* release-artifacts/crds/
-          tar -czf release-artifacts/crds.tar.gz -C release-artifacts/crds .
-          cp config/crd/bases/* release-artifacts/
-          cp dist/install.yaml release-artifacts/
-
       - name: Generate Release Notes
         run: |
           mkdir -p .artifacthub/release-notes
@@ -44,9 +33,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            release-artifacts/*.yaml
-            release-artifacts/*.tar.gz
             release-artifacts/*.tgz
             .artifacthub/release-notes/v${{ env.VERSION }}.yml
-          body_path: .artifacthub/release-notes/v${{ env.VERSION }}.yml
           generate_release_notes: true
+          body: |
+            📦 Released Helm Chart v${{ env.VERSION }}
+
+            🔗 View installation instructions in our documentation.
