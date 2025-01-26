@@ -1,0 +1,86 @@
+# Default values for metadata-injector.
+
+# Nameoverride and fullnameOverride allow you to customize the names used throughout the chart
+nameOverride: ""
+fullnameOverride: ""
+
+# Namespace configuration
+namespace:
+  create: true
+  name: "metadata-injector-system"
+
+# Image configuration
+image:
+  repository: ruslanguns/metadata-injector-operator
+  tag: v0.0.1
+  pullPolicy: IfNotPresent
+
+# Service account configuration
+serviceAccount:
+  create: true
+  name: "" # If not set and create is true, a name is generated using the fullname template
+  annotations: {}
+
+# RBAC configuration
+rbac:
+  create: true
+  rules:
+    - apiGroups: ["*"]
+      resources: ["*"]
+      verbs: ["get", "list", "watch", "patch", "update"]
+
+# Resources configuration
+resources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+
+# Metrics configuration
+metrics:
+  enabled: true
+  port: 8443
+  service:
+    type: ClusterIP
+    annotations: {}
+
+# Health probe configuration
+probe:
+  port: 8081
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+# Security context
+podSecurityContext:
+  runAsNonRoot: true
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# Deployment configuration
+replicaCount: 1
+
+# CRDs configuration
+crds:
+  create: true
+
+# Pod annotations
+podAnnotations: {}
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

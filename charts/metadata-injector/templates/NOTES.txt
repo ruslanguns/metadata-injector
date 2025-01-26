@@ -1,0 +1,33 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+The operator has been deployed to {{- if .Values.namespace.name }}
+  namespace: {{ include "metadata-injector.namespaceName" . }}
+  {{- end }}
+
+To create a MetadataInjector resource, use:
+
+apiVersion: core.k8s.ruso.dev/v1alpha1
+kind: MetadataInjector
+metadata:
+  name: example-injector
+spec:
+  selectors:
+    - kind: Pod
+      group: ""
+      version: "v1"
+      namespaces:
+        - default
+  inject:
+    labels:
+      environment: production
+    annotations:
+      description: "Managed by metadata-injector"
+
+For more information, visit: {{ .Chart.Home }}

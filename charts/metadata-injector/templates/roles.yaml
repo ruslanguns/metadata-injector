@@ -1,0 +1,70 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "metadata-injector.fullname" . }}-manager-role
+  labels:
+    {{- include "metadata-injector.labels" . | nindent 4 }}
+rules:
+  # Operator specific rules
+  - apiGroups:
+      - core.k8s.ruso.dev
+    resources:
+      - metadatainjectors
+      - metadatainjectors/status
+      - metadatainjectors/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  # Additional rules from values
+  {{- with .Values.rbac.rules }}
+    {{- toYaml . | nindent 2 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "metadata-injector.fullname" . }}-leader-election-role
+  {{- if .Values.namespace.name }}
+  namespace: {{ include "metadata-injector.namespaceName" . }}
+  {{- end }}
+  labels:
+    {{- include "metadata-injector.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+{{- end }}

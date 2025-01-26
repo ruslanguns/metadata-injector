@@ -1,0 +1,15 @@
+apiVersion: v2
+name: metadata-injector
+description: A Kubernetes operator that automatically injects metadata into specified resources across your cluster
+version: 0.1.0
+appVersion: "0.0.1"
+type: application
+keywords:
+  - kubernetes
+  - operator
+  - metadata
+  - injector
+home: https://github.com/ruslanguns/metadata-injector-operator
+maintainers:
+  - name: Ruslan Gonzalez
+    email: ruslanguns@gmail.com

@@ -1,0 +1,24 @@
+{{- if .Values.metrics.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "metadata-injector.fullname" . }}-metrics-service
+  {{- if .Values.namespace.name }}
+  namespace: {{ include "metadata-injector.namespaceName" . }}
+  {{- end }}
+  labels:
+    {{- include "metadata-injector.labels" . | nindent 4 }}
+  {{- with .Values.metrics.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.metrics.service.type }}
+  ports:
+    - port: {{ .Values.metrics.port }}
+      targetPort: {{ .Values.metrics.port }}
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "metadata-injector.selectorLabels" . | nindent 4 }}
+{{- end }}
