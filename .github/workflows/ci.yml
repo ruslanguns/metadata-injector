@@ -1,8 +1,12 @@
-name: Tests
+name: CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "v*"
 
 jobs:
   verify:
