@@ -2,18 +2,20 @@ apiVersion: core.k8s.ruso.dev/v1alpha1
 kind: MetadataInjector
 metadata:
   name: metadatainjector-sample
+  annotations:
+    metadata-injector.ruso.dev/disable-auto-reconcile: "false"
+    metadata-injector.ruso.dev/reconcile-interval: 1m
 spec:
   selectors:
     - kind: Secret
       version: v1
       namespaces:
         - default
-        - kube-system
       names:
         - secret-name-1
-        - secret-name-2
   inject:
     labels:
       foo: "bar"
     annotations:
       bar: "foo"
+      replicator.v1.mittwald.de/replicate-to: "test0[1-4]"
