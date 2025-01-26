@@ -72,17 +72,17 @@ jobs:
       - name: Update Helm Chart version and values
         run: |
           # Actualizar versión del chart y appVersion
-          sed -i "s/^version:.*/version: ${VERSION}/" chart/metadata-injector/Chart.yaml
-          sed -i "s/^appVersion:.*/appVersion: \"${VERSION}\"/" chart/metadata-injector/Chart.yaml
+          sed -i "s/^version:.*/version: ${VERSION}/" charts/metadata-injector/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"${VERSION}\"/" charts/metadata-injector/Chart.yaml
 
           # Actualizar la imagen en values.yaml
-          sed -i "s|repository:.*|repository: ${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator|" chart/metadata-injector/values.yaml
-          sed -i "s|tag:.*|tag: v${VERSION}|" chart/metadata-injector/values.yaml
+          sed -i "s|repository:.*|repository: ${{ env.REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/metadata-injector-operator|" charts/metadata-injector/values.yaml
+          sed -i "s|tag:.*|tag: v${VERSION}|" charts/metadata-injector/values.yaml
 
       - name: Package Helm Chart
         run: |
           mkdir -p .cr-release-packages
-          helm package chart/metadata-injector --destination .cr-release-packages
+          helm package charts/metadata-injector --destination .cr-release-packages
 
       - name: Upload Helm Chart to GitHub Release
         uses: softprops/action-gh-release@v1
