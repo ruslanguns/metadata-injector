@@ -122,7 +122,7 @@ test: manifests generate fmt vet envtest ## Run tests.
 .PHONY: test-e2e
 test-e2e: manifests generate fmt vet ## Run the e2e tests. Expected an isolated environment using Kind.
 	@command -v kind >/dev/null 2>&1 || { \
-		echo "Kind is not installed. Please install Kind manually."; \
+		echo "Kind is not installed. PPlease install Kind manually."; \
 		exit 1; \
 	}
 	@kind get clusters | grep -q 'kind' || { \
