@@ -9,10 +9,10 @@ entries:
       artifacthub.io/operatorCapabilities: Basic Install
     apiVersion: v2
     appVersion: 0.0.1
-    created: "2025-01-26T21:12:56.875663943Z"
+    created: "2025-01-27T20:12:49.629508999Z"
     description: A Kubernetes operator that automatically injects metadata into specified
       resources across your cluster
-    digest: d7e57376f397c0fbfeac521b1f1cdc0e9505eb5493a288b728cf55c63851e66c
+    digest: c4c2809a3f675ff08e38855bede4c1c3d1477a2f64de151dbf6c2b69fa72736c
     home: https://github.com/ruslanguns/metadata-injector-operator
     keywords:
     - kubernetes
@@ -29,4 +29,4 @@ entries:
     urls:
     - https://ruslanguns.github.io/metadata-injector-operator/charts/metadata-injector-0.0.1.tgz
     version: 0.0.1
-generated: "2025-01-26T21:12:56.874888772Z"
+generated: "2025-01-27T20:12:49.628838858Z"
